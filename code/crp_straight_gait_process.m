@@ -37,8 +37,7 @@ for  i = 1:length(fl)
      end
      if TF == 1 
      T = readmatrix('Muskelfunktionstest.csv');
-     T(1,:) = []; 
-     T(:,1) = []; 
+     T(:,:) = []; 
      T(27,12) = data.zoosystem.Anthro.GMFCS; 
      T(33,3) = data.zoosystem.Anthro.Sex; % 1= Male, 2=Female 
      T(27,3) = data.zoosystem.Anthro.Age;
