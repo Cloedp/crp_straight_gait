@@ -1,6 +1,6 @@
 %% STEP 1: CONVERT C3D TO ZOO FILE
 
-fld = uigetfolder       % Select crp_straight_gait
+fld = uigetfolder;       % Select crp_straight_gait
 fld_c3d = [fld,'data/c3d_data'];
 fld1 = [fld,'data/1-c3d2zoo'];
 
@@ -29,19 +29,22 @@ bmech_copyall(fld1,fld2,'all')
 % b) Create new anthro events for channel Anthro
 fl = engine('fld', fld2, 'extension', 'zoo');
 for  i = 1:length(fl)
-     TF = iscell('Age'); % If there is age, there is GMFCS and sex.
-     if TF == 0
-     % addchannel_data ??? (INCAPABLE DE RÉUSSIR A PROGRAMMER QUELQUECHOSE
-     % DANS ZOOSYSTEM.ANTHRO) Je ne suis pas sur si je dois faire une
-     % fonction ou si ca se fait sans.
-     end
-     if TF == 1 
-     T = readmatrix('Muskelfunktionstest.csv');
-     T(:,:) = []; 
-     T(27,12) = data.zoosystem.Anthro.GMFCS; 
-     T(33,3) = data.zoosystem.Anthro.Sex; % 1= Male, 2=Female 
-     T(27,3) = data.zoosystem.Anthro.Age;
-     end
+    fld_sub = fileparts(fl{i});
+    data = zload(fl{i});
+    if ~isfield(data.zoosystem.Anthro, 'Age')
+        mft_path = [fld_sub, filesep, 'Muskelfunktionstest.csv'];
+        
+        % read csv file
+        %T = readmatrix(mft_path);
+        M=csvread(mft_path);
+        
+        % write to zoo
+        data.zoosystem.Anthro.GMFCS = T(27,12);
+        data.zoosystem.Anthro.Sex = T(33,3); % 1= Male, 2=Female
+        data.zoosystem.Anthro.Age = T(27,3) ;
+        
+        zsave(fl{i}, data)
+    end
 end
       
 %% STEP 3: REMOVE ADULTS (-18 YEARS OLD?)
