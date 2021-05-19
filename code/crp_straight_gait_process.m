@@ -27,9 +27,9 @@ c3d2zoo(fld1,'yes')
 %bmech_copyall(fld1,fld2,'all')
 
 % b) Create new anthro events for channel Anthro 
-        bmech_extract_in_mft(fld2,'Age');
-        bmech_extract_in_mft(fld2,'Sex');
-        bmech_extract_in_mft(fld2,'GMFCS');
+bmech_extract_in_mft(fld2,'Age');
+bmech_extract_in_mft(fld2,'Sex');
+bmech_extract_in_mft(fld2,'GMFCS');
       
 %% STEP 3: REMOVE ADULTS (-18 YEARS OLD?)
 
