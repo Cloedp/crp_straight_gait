@@ -20,32 +20,16 @@ c3d2zoo(fld1,'yes')
 
 %% STEP 2: EXTRACT MUSCLE FUCNTION DATA FROM CSV SHEET
 
-fld1 = [fld,'data/1-c3d2zoo'];
-fld2 = [fld,'data/2-muscle_extract'];
+%fld1 = [fld,'data/1-c3d2zoo'];
+%fld2 = [fld,'data/2-muscle_extract'];
 
 % a) Copy step 1 files
-bmech_copyall(fld1,fld2,'all')
+%bmech_copyall(fld1,fld2,'all')
 
-% b) Create new anthro events for channel Anthro
-fl = engine('fld', fld2, 'extension', 'zoo');
-for  i = 1:length(fl)
-    fld_sub = fileparts(fl{i});
-    data = zload(fl{i});
-    if ~isfield(data.zoosystem.Anthro, 'Age')
-        mft_path = [fld_sub, filesep, 'Muskelfunktionstest.csv'];
-        
-        % read csv file
-        %T = readmatrix(mft_path);
-        M=csvread(mft_path);
-        
-        % write to zoo
-        data.zoosystem.Anthro.GMFCS = T(27,12);
-        data.zoosystem.Anthro.Sex = T(33,3); % 1= Male, 2=Female
-        data.zoosystem.Anthro.Age = T(27,3) ;
-        
-        zsave(fl{i}, data)
-    end
-end
+% b) Create new anthro events for channel Anthro 
+        bmech_extract_in_mft(fld2,'Age');
+        bmech_extract_in_mft(fld2,'Sex');
+        bmech_extract_in_mft(fld2,'GMFCS');
       
 %% STEP 3: REMOVE ADULTS (-18 YEARS OLD?)
 
