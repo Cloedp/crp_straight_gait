@@ -22,9 +22,6 @@ if ~iscell(anthro)
     anthro = {anthro};
 end
 
-
-
-
 % Batch process
 
 cd(fld)
