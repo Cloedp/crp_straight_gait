@@ -10,9 +10,9 @@
 % b) Delete abnormal folders (empty)
 subjects = extract_filestruct(fld1);
 for i = 1:length(subjects)
-    fl = engine('fld',fld1, 'search path', subjects{i});
-    if isempty({fl})
-    bmech_removefolder('fld', fld1,'sfld',subjects{i});
+    fl = engine('fld',fld1, 'search path', subjects{i}, 'extension','c3d');
+    if isempty(fl)
+    bmech_removefolder('fld',fld1,'sfld',subjects{i});
     end
 end
 % c) Delete folder with no mft sheet
