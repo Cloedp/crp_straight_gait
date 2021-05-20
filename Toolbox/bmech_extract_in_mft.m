@@ -1,14 +1,14 @@
 function bmech_extract_in_mft(fld,anthro)
 
 % EXTRACT_IN_MFT(fld, anthro)
-% Batch process removal of unwanted participants (data) based on anthro
-
+% Batch process extraction of anthro data in the mft sheet
+%
 % ARGUMENTS
 % fld       ...  Folder to batch process (string)
 % anthro    ...  Anthro(s) to extract from the mft sheet
-
+%
 % Created 2021
-
+%
 % Set defaults/Error check
 
 if nargin==0
@@ -52,8 +52,10 @@ for i = 1:length(fl)
         if ~isfield(data.zoosystem.Anthro,'GMFCS')
             mft_path = [fld_sub, filesep, 'Muskelfunktionstest.csv']; % Set path mft.csv
             C = readcell(mft_path);
-            [row,col] = find(strcmp(C,'GMFCS'));
+            [row,col] = find(strcmp(C,'GMFCS')) | find(strcmp(C,'GMFCS - RUN'));
             if isempty(C(row,col+1))
+                GMFCS = 0;
+            elseif strcmp(C(row,col+1),'-')
                 GMFCS = 0;
             else
                 GMFCS = C(row,col+1);
