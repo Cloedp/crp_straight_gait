@@ -1,21 +1,29 @@
 %% STEP 1: CONVERT C3D TO ZOO FILE
 
-%fld = uigetfolder;       % Select crp_straight_gait
-%fld_c3d = [fld,'data/c3d_data'];
-%fld1 = [fld,'data/1-c3d2zoo'];
+fld = uigetfolder;          % Select crp_straight_gait
+fld_c3d = [fld,'data/c3d_data'];
+fld1 = [fld,'data/1-c3d2zoo'];
 
 % a) Copy c3d files
-%bmech_copyall(fld_c3d,fld1,'all')
+bmech_copyall(fld_c3d,fld1,'all')
 
 % b) Delete abnormal folders (empty)
 subjects = extract_filestruct(fld1);
 for i = 1:length(subjects)
-    fl = engine('fld',fld1, 'search path', subjects{i}, 'extension','c3d');
-    if isempty(fl)
-    bmech_removefolder('fld',fld1,'sfld',subjects{i});
+    fl = engine('fld',fld1, 'search path', subjects{i}, 'extension','c3d'); % chek for only c3d files
+    if isempty(fl)                                                          % if no csv files
+    bmech_removefolder(fld1,subjects{i});
     end
 end
+
 % c) Delete folder with no mft sheet
+subjects = extract_filestruct(fld1);
+for i = 1:length(subjects)
+    fl = engine('fld',fld1, 'search path', subjects{i},'extension','csv');  % chek for only csv files
+    if isempty(fl)                                                          % if no csv file = no mft file
+    bmech_removefolder(fld1,subjects{i});                                   % remove subject because not enough info
+    end
+end
 
 % d) Delete trials that are not self-selected speed 
 fldel_gl = engine('fld',fld1,'search file','_gl_'); 
@@ -44,11 +52,11 @@ bmech_remove_by_anthro(fld2,'Age',18,'>=');
 
 %% STEP 3: EXTRACT MUSCLE FUCNTION DATA FROM CSV SHEET
 
-%fld2 = [fld,'data/2-remove_adults'];
-%fld3 = [fld,'data/3-muscle_extract'];
+fld2 = [fld,'data/2-remove_adults'];
+fld3 = [fld,'data/3-muscle_extract'];
 
 % a) Copy step 1 files
-%bmech_copyall(fld2,fld3,'all')
+bmech_copyall(fld2,fld3,'all')
 
 % b) Extract Hemiplegia or Diplegia 
 bmech_extract_CP_type(fld3);
