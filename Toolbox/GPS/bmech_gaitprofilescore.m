@@ -1,6 +1,6 @@
 function bmech_gaitprofilescore(fld,flag)
 
-% BMECH_GAITPROFILESCORE(nfld,fld,ch) computes gait variable score (GVS)
+% BMECH_GAITPROFILESCORE(fld,flag) computes gait variable score (GVS)
 % and gait profile score (GPS) based on a reference database
 %
 % ARGUMENTS
@@ -25,15 +25,15 @@ switch nargin
         flag = '_g_';
         
     case 1
-        flag = '_g_';
+        flag = '';
         
 end
 
 % channels for GPS (from Baker)
 ch_gps = {'BelfastPelvisAngles_x', 'BelfastPelvisAngles_y','BelfastPelvisAngles_z',...
-          'HipAngles_x','HipAngles_y','HipAngles_z',...
-          'KneeAngles_x','AnkleAngles_x',...
-          'FootProgressAngles_z'};
+    'HipAngles_x','HipAngles_y','HipAngles_z',...
+    'KneeAngles_x','AnkleAngles_x',...
+    'FootProgressAngles_z'};
 
 cd(fld)
 
@@ -43,7 +43,13 @@ cd(fld)
 % associate each subject with correct normative data----
 for i = 1:length(subs)
     sub = subs{i};
-    fl = engine('fld',fld,'search path', sub, 'search file', flag);
+    
+    if isempty(flag)
+        fl = engine('fld',fld,'search path', sub);
+    else
+        fl = engine('fld',fld,'search path', sub, 'search file', flag);
+    end
+    
     if ~isempty(fl)
         
         sidestk = cell(size(fl));
@@ -78,23 +84,21 @@ for i = 1:length(subs)
                     data = addchannel_data(data, [sides{k}, 'BelfastPelvisAngles_z'],Pel_x, 'Video');
                 end
             end
-                  
+            
             % TEMP ADDING OF ANTHRO FOR DEMO
             if ~isfield(data.zoosystem.Anthro, 'Age')
-                warning('missing age info, assigning age 14 for testing')
-                data.zoosystem.Anthro.Age = 14;
+                error('missing age info')
             end
             
             if ~isfield(data.zoosystem.Anthro, 'Sex')
-                warning('missing sex info, assigning Female for testing')
-                data.zoosystem.Anthro.Sex = 'F';
+                error('missing sex info')   
             end
             
             % find appropriate data set for GPS comparison
             [group, norm_data] = iddataset(data);
             disp(' ')
             disp(['computing GPS for subject ',sub, ' trial ', trial, ' for ',group,' age group'])
-           
+            
             [GPS_r,GPS_l,r] = computegps(data,norm_data, ch_gps);
             if GPS_r == 999
                 continue
@@ -208,7 +212,7 @@ for i = 1:length(rch)
     
     data.(rch{i}).event.gvs =  r.(rch{i}).event.gvs;
     
-
+    
 end
 
 
