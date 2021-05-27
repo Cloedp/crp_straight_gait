@@ -58,17 +58,11 @@ fld3 = [fld,'data/3-muscle_extract'];
 % a) Copy step 1 files
 bmech_copyall(fld2,fld3,'all')
 
-% b) Extract Hemiplegia or Diplegia 
-bmech_extract_CP_type(fld3);
-
-% c) Remove Hemi child
-bmech_remove_by_anthro(fld3,'CP_type',hemiplegia,'=');
-
 % d) Extract Anthro Sex & GMFCS  
 bmech_extract_in_mft(fld3,'Sex');
 bmech_extract_in_mft(fld3,'GMFCS');
 
-%% STEP 4: REMOVE UNUSED CHANNELS
+%% STEP 4: REMOVE CHANNELS
 
 fld3 = [fld,'data/3-muscle_extract'];
 fld4 = [fld,'data/4-remove_channels'];
@@ -76,10 +70,16 @@ fld4 = [fld,'data/4-remove_channels'];
 % a) Copy step 3 files
 bmech_copyall(fld3,fld4,'all')
 
-% Remove extra Vicon channels 
+% b) Remove extra Vicon channels ??NEED MORE FOR THE GPS??
 chkp= {'LHipAngles','RHipAngles', 'LKneeAngles','RKneeAngles',...
-       'LAnkleAngles','RAnkleAngles','SACR'};  
+       'LAnkleAngles','RAnkleAngles','SACR','LPelvisAngles','RPelvisAngles',...
+       'LFootProgressAngles','RFootProgressAngles'};  
+
 bmech_removechannel('fld',fld4,'chkp','keep')
+
+% c) Explode channels 
+
+bmech_explode (fld4, chkp)
 
 %% STEP 5: COMPUTE GPS
 
@@ -88,6 +88,8 @@ fld5 = [fld,'data/5-compute_gps'];
 
 % a) Copy step 4 files
 bmech_copyall(fld4,fld5,'all')
+
+bmech_gaitprofilescore(fld5)
 
 %% STEP 6: CRP PROCESS
 
