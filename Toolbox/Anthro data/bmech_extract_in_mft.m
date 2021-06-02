@@ -23,7 +23,7 @@ end
 cd(fld);
 fl = engine('fld',fld,'extension','zoo');
 for i = 1:length(fl)
-    batchdisp(fl{i})
+    batchdisp(fl{i}, 'extracting mft')
     data = zload(fl{i});
     fld_sub = fileparts(fl{i});
     
@@ -52,14 +52,19 @@ for i = 1:length(fl)
         if ~isfield(data.zoosystem.Anthro,'GMFCS')
             mft_path = [fld_sub, filesep, 'Muskelfunktionstest.csv']; % Set path mft.csv
             C = readcell(mft_path);
-            [row,col] = find(strcmp(C,'GMFCS')) | find(strcmp(C,'GMFCS - RUN'));
-            if isempty(C(row,col+1))
+            [row,col] = find(strcmp(C,'GMFCS - RUN'));
+            if isempty(row)
+                [row,col] = find(strcmp(C,'GMFCS'));
+            end
+            a = C(row,col+1);
+            if isempty(a)
                 GMFCS = 0;
-            elseif strcmp(C(row,col+1),'-')
+            elseif strcmp(a,'-')
+                GMFCS = 0;
+            elseif ismissing(a{1})
                 GMFCS = 0;
             else
-                GMFCS = C(row,col+1);
-                GMFCS = GMFCS{1};
+                GMFCS = a{1};
             end
             data.zoosystem.Anthro.GMFCS = GMFCS; % write to zoo
         end

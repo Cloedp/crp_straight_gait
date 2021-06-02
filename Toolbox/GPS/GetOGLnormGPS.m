@@ -43,6 +43,12 @@ root = root(1:indx(end-1)) ;
 root = [root,'Gait',s,'GPS',s];
 gpsfile = [root,'8.20 GPS Calculation.xlsx'];
 
+if ~exist(gpsfile, 'file')
+    root = root(1:indx(end-3)) ;
+    fl = engine('fld', root, 'search file', '8.20 GPS Calculation.xlsx');
+    gpsfile = fl{1};
+end
+
 cfile = [root,group,'.mat'];
 
 switch group

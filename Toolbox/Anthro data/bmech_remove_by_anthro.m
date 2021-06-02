@@ -5,7 +5,7 @@ function bmech_remove_by_anthro(fld, anthro, value, action)
 %
 % ARGUMENTS
 % fld       ...  Folder to batch process (string)
-% anthro    ...  Anthro(s) to operate on (single string or cell array of strings)
+% anthro    ...  Anthro to operate on. Single string. ex. 'Age'
 % value     ...  Condition to remove (i.e.18 to remove adult participants)
 % action    ...  Action to take on data (string): '>=','<=','<','>','='
 %
@@ -18,8 +18,8 @@ if nargin==0
     anthro = 'Age';
 end
 
-if ~iscell(anthro)
-    anthro = {anthro};
+if iscell(anthro)
+    anthro = anthro{1};
 end
 
 % Batch process
