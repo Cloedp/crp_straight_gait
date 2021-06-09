@@ -1,27 +1,31 @@
 %% PREPARATION: ClEANING DATA
+% The stucture needs to be a folder (crp_straight_gait) contraining a 'data' folder 
+% with all the participants inside (no more folder separation)
 
-fld = uigetfolder;          % Select crp_straight_gait
+fld = uigetfolder;              % Select crp_straight_gait
 fld_c3d = [fld,filesep, 'data', filesep, 'c3d_data'];
 fld0 = [fld,filesep, 'data', filesep, '0-c3d_clean'];
 
 % a) Copy c3d files
-copyfile(fld_c3d,fld0)
+copyfile(fld_c3d,fld0);
 
 % b) Delete abnormal folders (empty)
-subjects = extract_filestruct(fld0);
+[~,~,subjects] = extract_filestruct(fld);
 for i = 1:length(subjects)
     fl = engine('fld',fld0, 'search path', subjects{i}, 'extension','c3d'); % chek for only c3d files
     if isempty(fl)                                                          % if no csv files
     bmech_removefolder(fld0,subjects{i});
+    disp(['removing subject ', subjects{i},' because he has no files'])
     end
 end
 
 % c) Delete folder with no mft sheet
-subjects = extract_filestruct(fld0);
+[~,~,subjects] = extract_filestruct(fld);
 for i = 1:length(subjects)
     fl = engine('fld',fld0, 'search path', subjects{i},'extension','csv');  % chek for only csv files
     if isempty(fl)                                                          % if no csv file = no mft file
-    bmech_removefolder(fld0,subjects{i});                                   % remove subject because not enough info
+    bmech_removefolder(fld0,subjects{i}); 
+    disp(['removing subject ', subjects{i},' because he has no mft sheet'])                                   % remove subject because not enough info
     end
 end
 
@@ -38,10 +42,10 @@ delfile(fldel_st);
 fld1 = [fld,filesep, 'data', filesep, '1-c3d2zoo'];
 
 % a) Copy c3d clean files
-copyfile(fld0,fld1)
+copyfile(fld0,fld1);
 
 % b) Covert c3d to zoo
-c3d2zoo(fld1,'yes')
+c3d2zoo(fld1,'yes');
       
 %% STEP 2: REMOVE ADULTS (-18 YEARS OLD)
 
@@ -64,7 +68,7 @@ fld3 = [fld,filesep, 'data', filesep,'3-muscle_extract'];
 copyfile(fld2,fld3)
 
 % b) Extract Anthro Sex & GMFCS  
-bmech_extract_in_mft(fld3,'Sex');
+bmech_extract_in_mft(fld3,'Sex');   %(1=M, 2=F)
 bmech_extract_in_mft(fld3,'GMFCS');
 
 %% STEP 4: REMOVE CHANNELS
@@ -90,9 +94,10 @@ bmech_explode(fld4,chkp)
 fld5 = [fld,filesep, 'data', filesep, '5-compute_gps'];
 
 % a) Copy step 4 files
-copyfile(fld4,fld5)
+copyfile(fld4,fld5);
 
-bmech_gaitprofilescore(fld5)
+bmech_gaitprofilescore(fld5);
+
 
 %% STEP 6: CRP PROCESS
 
