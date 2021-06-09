@@ -1,4 +1,4 @@
-function data = phase_angle_data(data, evt1, evt2, chns)
+function data = phase_angle_data(data, chns, evt1, evt2)
 
 if isempty(evt1)
     events = false;
