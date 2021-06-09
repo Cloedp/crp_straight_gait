@@ -38,7 +38,7 @@ ch_gps = {'BelfastPelvisAngles_x', 'BelfastPelvisAngles_y',...
 cd(fld)
 
 % Extract data by subject (file structure must respect biomechZoo standard)
-[~, subs] = extract_filestruct(fld);
+[subs] = extract_filestruct(fld);
 
 % associate each subject with correct normative data----
 for i = 1:length(subs)
@@ -54,16 +54,20 @@ for i = 1:length(subs)
         
         sidestk = cell(size(fl));
         GPSstk = NaN*ones(size(fl));
+        
         for j = 1:length(fl)
             
             [~, trial, ext] = fileparts(fl{j});
             if strcmp(ext, '.c3d')
                 data = c3d2zoo(fl{j});
             elseif strcmp(ext, '.zoo')
-                data =  zload(fl{1});  % load the first to check age and sex
-            else
+                data =  zload(fl{1});  % load the first to check age and sex  
+            elseif strcmp (ext, '.csv')
+            else 
                 error(['unknown file type: ', ext])
-            end
+            end 
+            
+            fl = engine('fld',fld,'extension','zoo'); % because otherwise mft sheet is problematic
             
             % make sure data are exploded
             if ~isfield(data, 'RKneeAngles_x')
