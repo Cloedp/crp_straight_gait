@@ -106,16 +106,30 @@ fld6 = [fld,filesep, 'data', filesep, '6-process_crp'];
 % a) Copy step 5 files
 copyfile(fld5,fld6)
 
-% b) Compute CRP for both limb
-bmech_computecrp_straight(fld6,'L')
-bmech_computecrp_straight(fld6,'R')
+% b) compute phase angle on complete signal
+ch = {'LHipAngles_x', 'LKneeAngles_x','LAnkleAngles_x'};
+bmech_phase_angle(fld6, ch)
 
-% c) Calculate deviation phase (DP) and mean absolute relative phase (MARP)
+% c) partition to 1 gait cycle
+evt1 = 'Left_FootStrike1';
+evt2 = 'Left_FootStrike2';
+bmech_partition(fld6, evt1, evt2)
 
-bmech_computeDP_straight(fld6,'L')
-bmech_computeDP_straight(fld6,'R')
+% d) normalize to 100%
+bmech_normalize(fld6)
+
+% e) Compute CRP
+ch_KH = {'LKneeAnglesPhase_x','LHipAnglesPhase_x'}; 
+ch_AK = {'LAnkleAnglesPhase_x','LKneeAnglesPhase_x'}; 
+bmech_continuous_relative_phase(fld6, ch_KH)
+bmech_continuous_relative_phase(fld6, ch_AK)
+
+% f) Calculate deviation phase (DP) and mean absolute relative phase (MARP)
 bmech_computeMARP_straight(fld6,'L')
 bmech_computeMARP_straight(fld6,'R')
+bmech_computeDP_straight(fld6,'L')
+bmech_computeDP_straight(fld6,'R')
+
 
 %% STEP 7: ADD EVENTS
 

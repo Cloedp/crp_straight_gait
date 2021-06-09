@@ -1,4 +1,8 @@
-function data = phase_angle_data(data, chns, evt1, evt2)
+function data = phase_angle_data(data, chns, evt1, evt2, dim)
+
+if nargin == 4
+    dim = '_x';
+end
 
 if isempty(evt1)
     events = false;
@@ -20,6 +24,9 @@ for i = 1:length(chns)
         pa = phase_angle(joint_angle);
     end
     
-    data = addchannel_data(data, [chns{i}, '_phase'], pa, 'video');
+    och = chns{i};
+    nch = strrep(och, dim, ['Phase', dim]);
     
+    data = addchannel_data(data, nch, pa, 'video');
+
 end
