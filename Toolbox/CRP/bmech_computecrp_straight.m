@@ -23,12 +23,12 @@ for i = 1:length(subjects)
         evt1 = 'Left_FootStrike1'; % data before and after evt1 and evt2 are used for padding
         evt2 = 'Left_FootStrike2';
         chns = {'LHipAngles_x','LKneeAngles_x'};
-        phase_angle_data(data, chns, evt1, evt2)
+        data = phase_angle_data(data, chns, evt1, evt2);
         
         % compute CRP for Knee-Hip
         dist_phase_angle_ch = 'LKneeAngles_x_phase';
         prox_phase_angle_ch = 'LHipAngles_x_phase';
-        continuous_relative_phase_data(data, dist_phase_angle_ch, prox_phase_angle_ch)
+        data = continuous_relative_phase_data(data, dist_phase_angle_ch, prox_phase_angle_ch);
         
         % compute CRP for Ankle-knee
         
