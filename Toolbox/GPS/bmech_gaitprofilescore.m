@@ -18,15 +18,12 @@ function bmech_gaitprofilescore(fld,flag)
 
 % Set Defaults
 %
-switch nargin
-    
+switch nargin 
     case 0
         fld = uigetfolder;
-        flag = '_g_';
-        
+        flag = '_g_';  
     case 1
-        flag = '';
-        
+        flag = '';      
 end
 
 % channels for GPS (from Baker)
@@ -38,7 +35,7 @@ ch_gps = {'BelfastPelvisAngles_x', 'BelfastPelvisAngles_y',...
 cd(fld)
 
 % Extract data by subject (file structure must respect biomechZoo standard)
-[subs] = extract_filestruct(fld);
+[~,subs] = extract_filestruct(fld);
 
 % associate each subject with correct normative data----
 for i = 1:length(subs)
@@ -51,32 +48,14 @@ for i = 1:length(subs)
     end
     
     if ~isempty(fl)
-        
         sidestk = cell(size(fl));
         GPSstk = NaN*ones(size(fl));
+        fl = engine('fld',fld,'extension','zoo');
         
         for j = 1:length(fl)
-            
-            [~, trial, ext] = fileparts(fl{j});
-            if strcmp(ext, '.c3d')
-                data = c3d2zoo(fl{j});
-            elseif strcmp(ext, '.zoo')
-                data =  zload(fl{1});  % load the first to check age and sex  
-            elseif strcmp (ext, '.csv')
-            else 
-                error(['unknown file type: ', ext])
-            end 
-            
-            fl = engine('fld',fld,'extension','zoo'); % because otherwise mft sheet is problematic
-            
-            % make sure data are exploded
-            if ~isfield(data, 'RKneeAngles_x')
-                data = explode_data(data);
-            end
-            
-            % check if data have belfast pelvis
-            if ~isfield(data, 'RBelfastPelvisAngles_x')
-                warning('belfast pelvis angles,, not available using Pig pelvis')
+            [~, trial] = fileparts(fl{j});
+            data = zload(fl{j});
+            if isfield(data,'RPelvisAngles_x')
                 sides = {'R', 'L'};
                 for k = 1:length(sides)
                     Pel_x = data.([sides{k}, 'PelvisAngles_x']).line;
@@ -88,6 +67,7 @@ for i = 1:length(subs)
                     data = addchannel_data(data, [sides{k}, 'BelfastPelvisAngles_z'],Pel_x, 'Video');
                 end
             end
+        end
             
             % TEMP ADDING OF ANTHRO FOR DEMO
             if ~isfield(data.zoosystem.Anthro, 'Age')
@@ -110,128 +90,7 @@ for i = 1:length(subs)
                 data = addgps(data,GPS_r,GPS_l,r);
                 zsave(fl{j},data);
             end
-            
-            % use following line with caution
-            % checkconsis(sub,sidestk,GPSstk)
-        end
     end
-    
+end   
 end
-
-
-function checkconsis(sub,sidestk,GPSstk)
-
-% check consistency amongs straight trials
-fl = engine('path',sub,'extension','zoo');
-
-sidestk(cellfun(@isempty,sidestk)) = [];   % That's some hot programming
-sides1 = unique(sidestk);
-
-if length(sides1)>1 && nanmean(GPSstk)>1.6
-    
-    disp('Different sides selected for more affected!')
-    
-    if isin(sub,'TD')
-        
-        for d = 1:length(fl)
-            delfile(fl{d})
-        end
-        rmdir(sub)
-        
-    else
-        error('remove bad trial')
-    end
-    
-elseif length(sides1)>1 && nanmean(GPSstk)<1.6
-    fix = 'yes';
-    disp('small disagreement across sides, picking random side')
-    side = sidestk{1}; % this is random
-elseif isempty(sides1)
-    disp('deleting subject with no straight trials')
-    rmdir(sub,'s')
-else
-    fix = 'no';
-    side = sides1{1}; % there is only 1 and it is always the same
-    
-end
-
-
-fl = engine('path',sub,'extension','zoo');
-
-
-
-for j = 1:length(fl)  % cycle through again correcting turning
-    
-    data = zload(fl{j});
-    
-    
-    if ~isin(data.zoosystem.CompInfo.Condition,'Straight')
-        cside = data.zoosystem.CompInfo.GC_MoreAffectedSide;
-        
-        if cside ~=side
-            batchdisplay(fl{j},'correcting MA limb based on straight')
-            data.zoosystem.CompInfo.GC_MoreAffectedSide = sidestk{1};
-            save(fl{j},'data');
-        end
-        
-    elseif isin( data.zoosystem.CompInfo.Condition,'Straight') && isin(fix,'yes')
-        cside = data.zoosystem.CompInfo.GC_MoreAffectedSide;
-        
-        if cside ~=side
-            batchdisplay(fl{j},'making all straight the same ')
-            data.zoosystem.CompInfo.GC_MoreAffectedSide = side;
-            save(fl{j},'data');
-        end
-        
-    end
-    
-    
-    
-    
-end
-
-
-function data = addgps(data,GPS_r,GPS_l,r)
-
-ech = 'SACR_x';
-%---simple GPS computations
-%
-gps = nanmean([GPS_r GPS_l]);
-gps_diff = abs(GPS_r-GPS_l);
-
-% Add GPS events
-data.(ech).event.GPS_R    = [1 GPS_r 0];  % OGL always comes out as side1-->R, side2-->L
-data.(ech).event.GPS_L    = [1 GPS_l 0];
-data.(ech).event.GPS_diff = [1 gps_diff 0];
-data.(ech).event.GPS      = [1 gps 0];
-
-% Add GVS info from r struct
-rch = fieldnames(r);
-for i = 1:length(rch)
-    
-    rchn = rch{i};
-    under = strfind(rchn,'_');
-    dim = rchn(under:end);
-    chn = rchn(1:under-1);
-    
-    data.(rch{i}).event.gvs =  r.(rch{i}).event.gvs;
-    
-    
-end
-
-
-
-function [group, norm_data] = iddataset(data)
-
-group = findgpsgroup(data);
-norm_data = GetOGLnormGPS(group);
-
-
-
-
-
-
-
-
-
 
