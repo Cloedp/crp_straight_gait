@@ -26,42 +26,41 @@ end
 
 cd(fld)
 
-[subjects] = extract_filestruct(fld);
+[~,subjects] = extract_filestruct(fld);
 
 for i = 1:length(subjects)
     fl = engine('fld',fld,'extension','zoo', 'search path', subjects{i});
     data = zload(fl{1});
-    
     r = data.zoosystem.Anthro.(anthro);
     if strcmp(condition,'>=')
         if r >= value
-            rmdir(subjects{i},'s')
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])   
+           disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+           bmech_removefolder(fld,subjects{i});
         end
     end
     
     if strcmp(condition,'<=')
         if r <= value
-            rmdir(subjects{i},'s')
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])  
+            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+            bmech_removefolder(fld,subjects{i})
         end
     end
     if strcmp(condition,'<')
         if r < value
-            rmdir(subjects{i},'s')
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])  
+            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+            bmech_removefolder(fld,subjects{i})
         end
     end
     if strcmp(condition,'>')
         if r > value
-            rmdir(subjects{i},'s')
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])  
+            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+            bmech_removefolder(fld,subjects{i})
         end
     end
     if strcmp(condition,'=')
         if r == value
-            rmdir(subjects{i},'s')
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])  
+            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+            bmech_removefolder(fld,subjects{i})
         end
     end
 end
