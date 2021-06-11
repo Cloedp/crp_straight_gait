@@ -131,7 +131,7 @@ if exist(fld6, 'dir')
 end
 copyfile(fld5,fld6)
 
-% b) Remove trials that have missing events and channels 
+% b) Remove trials that have missing events and/or channels 
 % *** PARFOIS JUSTE RIGHT_FOOTSTRIKE1,2 ET JUSTE UN LEFT
 
 bmech_clean_for_pa(fld6); % **** ICI IL Y A UN ANS=0 QUI GOSSE
