@@ -131,16 +131,23 @@ if exist(fld6, 'dir')
 end
 copyfile(fld5,fld6)
 
-% b) compute phase angle on complete signal
-ch = {'LHipAngles_x', 'LKneeAngles_x','LAnkleAngles_x'};
-bmech_phase_angle(fld6, ch)
+% b) Remove trials that have missing events and channels 
+% *** PARFOIS JUSTE RIGHT_FOOTSTRIKE1,2 ET JUSTE UN LEFT
 
-% c) partition to 1 gait cycle
+bmech_clean_for_pa(fld6); % **** ICI IL Y A UN ANS=0 QUI GOSSE
+
+% b) compute phase angle on complete signal 
+chns = {'LHipAngles_x', 'LKneeAngles_x','LAnkleAngles_x'};
 evt1 = 'Left_FootStrike1';
 evt2 = 'Left_FootStrike2';
-bmech_partition(fld6, evt1, evt2)
+bmech_phase_angle(fld6, chns, evt1, evt2)
 
-% d) normalize to 100%
+% c) partition to 1 gait cycle
+%evt1 = 'Left_FootStrike1';
+%evt2 = 'Left_FootStrike2';
+%bmech_partition(fld6, evt1, evt2)
+
+% d) normalize to 100
 bmech_normalize(fld6)
 
 % e) Compute CRP
@@ -150,10 +157,10 @@ bmech_continuous_relative_phase(fld6, ch_KH)
 bmech_continuous_relative_phase(fld6, ch_AK)
 
 % f) Calculate deviation phase (DP) and mean absolute relative phase (MARP)
-bmech_computeMARP_straight(fld6,'L')
-bmech_computeMARP_straight(fld6,'R')
-bmech_computeDP_straight(fld6,'L')
-bmech_computeDP_straight(fld6,'R')
+%bmech_computeMARP_straight(fld6,'L')
+%bmech_computeMARP_straight(fld6,'R')
+%bmech_computeDP_straight(fld6,'L')
+%bmech_computeDP_straight(fld6,'R')
 
 
 %% STEP 7: ADD EVENTS
