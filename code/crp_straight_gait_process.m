@@ -41,7 +41,7 @@ fld1 = [fld,filesep, 'data', filesep, '1-c3d2zoo'];
 
 % a) Copy c3d clean files
 if exist(fld1, 'dir')
-    disp('removing old  data folder...')
+    disp('removing old data folder...')
     rmdir(fld1)
 end
 copyfile(fld0,fld1);
@@ -55,7 +55,7 @@ fld2 = [fld,filesep, 'data', filesep,'2-remove_adults'];
 
 % a) Copy step 1 files
 if exist(fld2, 'dir')
-    disp('removing old  data folder...')
+    disp('removing old data folder...')
     rmdir(fld2)
 end
 copyfile(fld1,fld2)
@@ -72,7 +72,7 @@ fld3 = [fld,filesep, 'data', filesep,'3-muscle_extract'];
 
 % a) Copy step 2 files
 if exist(fld3, 'dir')
-    disp('removing old  data folder...')
+    disp('removing old data folder...')
     rmdir(fld3)
 end
 copyfile(fld2,fld3)
@@ -91,7 +91,7 @@ fld4 = [fld,filesep, 'data', filesep, '4-remove_channels'];
 
 % a) Copy step 3 files
 if exist(fld4, 'dir')
-    disp('removing old  data folder...')
+    disp('removing old data folder...')
     rmdir(fld4)
 end
 copyfile(fld3,fld4)
@@ -113,7 +113,7 @@ fld5 = [fld,filesep, 'data', filesep, '5-compute_gps'];
 
 % a) Copy step 4 files
 if exist(fld5, 'dir')
-    disp('removing old  data folder...')
+    disp('removing old data folder...')
     rmdir(fld5)
 end
 copyfile(fld4,fld5);
@@ -126,7 +126,7 @@ fld6 = [fld,filesep, 'data', filesep, '6-process_crp'];
 
 % a) Copy step 5 files
 if exist(fld6, 'dir')
-    disp('removing old  data folder...')
+    disp('removing old data folder...')
     rmdir(fld6)
 end
 copyfile(fld5,fld6)
