@@ -18,19 +18,19 @@ function bmech_gaitprofilescore(fld,flag)
 
 % Set Defaults
 %
-switch nargin 
+switch nargin
     case 0
         fld = uigetfolder;
-        flag = '_g_';  
+        flag = '_g_';
     case 1
-        flag = '';      
+        flag = '';
 end
 
 % channels for GPS (from Baker)
 ch_gps = {'BelfastPelvisAngles_x', 'BelfastPelvisAngles_y',...
-          'BelfastPelvisAngles_z','HipAngles_x','HipAngles_y',...
-          'HipAngles_z','KneeAngles_x','AnkleAngles_x',...
-          'FootProgressAngles_z'};
+    'BelfastPelvisAngles_z','HipAngles_x','HipAngles_y',...
+    'HipAngles_z','KneeAngles_x','AnkleAngles_x',...
+    'FootProgressAngles_z'};
 
 cd(fld)
 
@@ -42,7 +42,7 @@ for i = 1:length(subs)
     sub = subs{i};
     
     if isempty(flag)
-        fl = engine('fld',fld,'search path', sub);
+        fl = engine('fld',fld,'search path', sub, 'ext', 'zoo');
     else
         fl = engine('fld',fld,'search path', sub, 'search file', flag);
     end
@@ -50,7 +50,7 @@ for i = 1:length(subs)
     if ~isempty(fl)
         sidestk = cell(size(fl));
         GPSstk = NaN*ones(size(fl));
-        fl = engine('fld',fld,'extension','zoo');
+        %fl = engine('fld',fld,'extension','zoo');
         
         for j = 1:length(fl)
             [~, trial] = fileparts(fl{j});
@@ -67,7 +67,6 @@ for i = 1:length(subs)
                     data = addchannel_data(data, [sides{k}, 'BelfastPelvisAngles_z'],Pel_x, 'Video');
                 end
             end
-        end
             
             % TEMP ADDING OF ANTHRO FOR DEMO
             if ~isfield(data.zoosystem.Anthro, 'Age')
@@ -75,7 +74,7 @@ for i = 1:length(subs)
             end
             
             if ~isfield(data.zoosystem.Anthro, 'Sex')
-                error('missing sex info')   
+                error('missing sex info')
             end
             
             % find appropriate data set for GPS comparison
@@ -90,7 +89,7 @@ for i = 1:length(subs)
                 data = addgps(data,GPS_r,GPS_l,r);
                 zsave(fl{j},data);
             end
+        end
     end
-end   
 end
 
