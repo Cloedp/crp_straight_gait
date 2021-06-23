@@ -12,7 +12,7 @@ fl = engine('path',fld,'extension','zoo');
 for i = 1:length(fl)
     data = zload(fl{i});  
     for c = length(chns)
-        if length(data.(chns{c}).line) <= data.SACR_x.event.Left_FootStrike2(1)
+        if length(data.(chns{c}).line) <= data.SACR_x.event.LFS2(1)
         delete(fl{i});
         batchdisp(fl{i},'deleting trials because of unsufficient frames for partition');
         end
