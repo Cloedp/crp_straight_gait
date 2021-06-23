@@ -85,7 +85,7 @@ bmech_extract_in_mft(fld3,'GMFCS');
 fl = engine('fld',fld3,'extension','csv'); 
 delfile(fl);
 
-%% STEP 4: REMOVE CHANNELS
+%% STEP 4: PREPARE DATA FOR ANALYSIS
 
 fld4 = [fld,filesep, 'data', filesep, '4-remove_channels'];
 
@@ -96,21 +96,35 @@ if exist(fld4, 'dir')
 end
 copyfile(fld3,fld4)
 
-% b) Remove extra Vicon channels
-chkp= {'LHipAngles','RHipAngles', 'LKneeAngles','RKneeAngles',...
-       'LAnkleAngles','RAnkleAngles','SACR','LPelvisAngles',...
-       'RPelvisAngles','LFootProgressAngles','RFootProgressAngles'};  
+% b) Explode channels 
+
+bmech_explode(fld4)
+
+% c) Add Foot Strike events
+
+bmech_addevent(fld4, 'SACR_x','RFS', 'RFS') 
+bmech_addevent(fld4, 'SACR_x','LFS', 'LFS')
+
+% d) Remove extra Vicon channels
+chkp= {'LHipAngles_x','LHipAngles_y','LHipAngles_z',...
+       'RHipAngles_x','RHipAngles_y','RHipAngles_z',...
+       'LKneeAngles_x','LKneeAngles_y','LKneeAngles_z',...
+       'RKneeAngles_x','RKneeAngles_y','RKneeAngles_z',...
+       'LAnkleAngles_x','LAnkleAngles_y','LAnkleAngles_z',...
+       'RAnkleAngles_x','RAnkleAngles_y','RAnkleAngles_z',...
+       'SACR_x','SACR_y','SACR_z','LPelvisAngles_x',...
+       'LPelvisAngles_y','LPelvisAngles_z','RPelvisAngles_x',...
+       'RPelvisAngles_y','RPelvisAngles_z','LFootProgressAngles_x',...
+       'LFootProgressAngles_y','LFootProgressAngles_z',...
+       'RFootProgressAngles_x','RFootProgressAngles_y','RFootProgressAngles_z'};  
 
 bmech_removechannel(fld4,chkp,'keep')
 
-% c) Explode channels 
+% e) Remove trials that have missing events and/or channels 
 
-bmech_explode(fld4,chkp)
+evt1 = 'LFS1';
+evt2 = 'LFS2';
 
-% d) Remove trials that have missing events and/or channels for the next
-% steps
-evt1 = 'Left_FootStrike1';
-evt2 = 'Left_FootStrike2';
 bmech_clean_for_pa(fld4,evt1, evt2); 
 
 %% STEP 5: COMPUTE GPS
@@ -137,36 +151,34 @@ if exist(fld6, 'dir')
 end
 copyfile(fld5,fld6)
 
-evt1 = 'Left_FootStrike1';
-evt2 = 'Left_FootStrike2';
-
 % b) compute phase angle on complete signal 
 chns = {'LHipAngles_x', 'LKneeAngles_x','LAnkleAngles_x'};
 bmech_phase_angle(fld6, chns)
 
-% c) delete trials that can be partition from LFootStrike 1 to LFootstrike2
+% c) delete trials that can be partition from LFS1 to LFS2
+
 n_chns = {'LHipAngles_x','LKneeAngles_x','LAnkleAngles_x'...
          'LHipAnglesPhase_x','LKneeAnglesPhase_x','LAnkleAnglesPhase_x'};
          
 bmech_delete_too_short(fld6, n_chns)
 
-% c) partition to 1 gait cycle
+% d) partition to a complete gait cycle
 bmech_partition(fld6, evt1, evt2)
 
-% d) Compute CRP
+% e) Compute CRP
 ch_KH = {'LKneeAnglesPhase_x','LHipAnglesPhase_x'}; 
 ch_AK = {'LAnkleAnglesPhase_x','LKneeAnglesPhase_x'}; 
 bmech_continuous_relative_phase(fld6, ch_KH)
 bmech_continuous_relative_phase(fld6, ch_AK)
 
-% e) normalize to 100
+% f) normalize to 101 frames
 bmech_normalize(fld6)
 
 %% STEP 7: COMPUTE METRICS (MARP, DP)
 
 fld7 = [fld,filesep, 'data', filesep, '7-compute-MARP-DP'];
 
-% a) Copy step 5 files
+% a) Copy step 6 files
 if exist(fld7, 'dir')
     disp('removing old data folder...')
     rmdir(fld7)
@@ -177,5 +189,77 @@ copyfile(fld6,fld7)
 
 bmech_computeMARP_DP(fld7)
 
-%% STEP 8: EXPORT
-% local event
+% c) Remove subjects with not enough trials for MARP and DP computation
+
+bmech_remove_2_trials_or_less(fld7)
+
+%% STEP 8: CREATE GAIT EVENTS
+
+fld8 = [fld,filesep, 'data', filesep, '8-gait-events'];
+
+% a) Copy step 7 files
+if exist(fld8, 'dir')
+    disp('removing old data folder...')
+    rmdir(fld8)
+end
+copyfile(fld7,fld8)
+
+% b) Create gait events 
+bmech_create_gait_events(fld8) 
+
+%% STEP 10: STATISTICAL ANALYSIS
+
+alpha = 0.05;
+evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
+dim1 = group;
+
+for e = 1:length(evt)
+    % ajouter nom de l'event dans le disp. 
+    % utiliser omni
+% a) MARP stats
+ch = 'L_KH_MARP';
+r = extracteventsdata(fld8,dim1,ch,evt{e});
+[~,pval] = ttest(r.CPOFM,r.Aschau_NORM,alpha);                                  
+disp(['p-value for L_KH_MARP = ',num2str(pval)])
+disp(['L_KH_MARP CPOFM = ',sprintf('%.1f',nanmean(r.CPOFM)),...
+    ' +/- ',sprintf('%.1f',nanstd(r.CPOFM)),' deg'])
+disp(['L_KH_MARP Aschau_NORM = ',sprintf('%.1f',nanmean(r.Aschau_NORM)),...
+    ' +/- ',sprintf('%.1f',nanstd(r.Aschau_NORM)),' deg'])
+disp(' ')
+
+
+ch = 'L_AK_MARP';
+r = extracteventsdata(fld8,dim1,ch,evt{e});
+[~,pval] = ttest(r.CPOFM,r.Aschau_NORM,alpha);                                  
+disp(['p-value for L_AK_MARP = ',num2str(pval)])
+disp(['L_AK_MARP CPOFM = ',sprintf('%.1f',nanmean(r.CPOFM)),...
+    ' +/- ',sprintf('%.1f',nanstd(r.CPOFM)),' deg'])
+disp(['L_AK_MARP Aschau_NORM = ',sprintf('%.1f',nanmean(r.Aschau_NORM)),...
+    ' +/- ',sprintf('%.1f',nanstd(r.Aschau_NORM)),' deg'])
+disp(' ')
+
+
+% b) DP stats
+
+ch = 'L_KH_DP';
+r = extracteventsdata(fld8,dim1,ch,evt{e});
+[~,pval] = ttest(r.CPOFM,r.Aschau_NORM,alpha);                                  
+disp(['p-value for L_KH_DP = ',num2str(pval)])
+disp(['L_KH_DP CPOFM = ',sprintf('%.1f',nanmean(r.CPOFM)),...
+    ' +/- ',sprintf('%.1f',nanstd(r.CPOFM)),' deg'])
+disp(['L_KH_DP Aschau_NORM = ',sprintf('%.1f',nanmean(r.Aschau_NORM)),...
+    ' +/- ',sprintf('%.1f',nanstd(r.Aschau_NORM)),' deg'])
+disp(' ')
+
+
+ch = 'L_AK_DP';
+r = extracteventsdata(fld8,dim1,ch,evt{e});
+[~,pval] = ttest(r.CPOFM,r.Aschau_NORM,alpha);                                  
+disp(['p-value for L_AK_DP = ',num2str(pval)])
+disp(['L_AK_DP CPOFM = ',sprintf('%.1f',nanmean(r.CPOFM)),...
+    ' +/- ',sprintf('%.1f',nanstd(r.CPOFM)),' deg'])
+disp(['L_AK_DP Aschau_NORM = ',sprintf('%.1f',nanmean(r.Aschau_NORM)),...
+    ' +/- ',sprintf('%.1f',nanstd(r.Aschau_NORM)),' deg'])
+disp(' ')
+
+end 
