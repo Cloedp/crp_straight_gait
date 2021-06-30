@@ -62,11 +62,11 @@ end
 gps_r = nanmean(gvsstk_r);                       
 gps_l= nanmean(gvsstk_l);              
 
-
+%%%%%%%%MODIFIER
 function [FS, side_order] = extract_foot_strike_events(data)
 
-[LFS1, ech] = findfield(data, 'Left_FootStrike1');
-RFS1 = findfield(data, 'Right_FootStrike1');
+[LFS1, ech] = findfield(data, 'LFS1');
+RFS1 = findfield(data, 'RFS1');
 if LFS1(1) < RFS1(1)
     startfoot = 'Left';
     side_order = {'L', 'R'};
