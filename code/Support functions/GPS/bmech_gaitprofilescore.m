@@ -1,12 +1,16 @@
-function bmech_gaitprofilescore(fld,flag)
+function bmech_gaitprofilescore(fld,flag,RightFS1,RightFS2,LeftFS1,LeftFS2)
 
-% BMECH_GAITPROFILESCORE(fld,flag) computes gait variable score (GVS)
+% BMECH_GAITPROFILESCORE(fld,flag,RightFS1,RightFS2,LeftFS1,LeftFS2) computes gait variable score (GVS)
 % and gait profile score (GPS) based on a reference database
 %
 % ARGUMENTS
 %  fld          ...   folder of subjects to operate on
 %  flag         ...   flag in file name for selection of trials. eg. '_g_'
 %                     for normal gait
+%  RightFS1     ...   Name of the event Right Foot Strike 1
+%  RightFS2     ...   Name of the event Right Foot Strike 2
+%  LeftFS1      ...   Name of the event Left Foot Strike 1
+%  LeftFS2      ...   Name of the event Left Foot Strike 2
 %
 % NOTES
 % - BelfastPelvis_x is int/ext rotation while BelfastPelvis_z is flex/ext
@@ -82,7 +86,7 @@ for i = 1:length(subs)
             disp(' ')
             disp(['computing GPS for subject ',sub, ' trial ', trial, ' for ',group,' age group'])
             
-            [GPS_r,GPS_l,r] = computegps(data,norm_data, ch_gps);
+            [GPS_r,GPS_l,r] = computegps(data,norm_data, ch_gps,RightFS1,RightFS2,LeftFS1,LeftFS2);
             if GPS_r == 999
                 continue
             else

@@ -1,9 +1,12 @@
-function [gps_r,gps_l,r]  = computegps(data,ndata, ch_gps)
+function [gps_r,gps_l,r]  = computegps(data,ndata, ch_gps, RightFS1,RightFS2,LeftFS1,LeftFS2)
 
 % Notes
 % - uses standard events from vicon
 
-
+%  RightFS1     ...   Name of the event Right Foot Strike 1
+%  RightFS2     ...   Name of the event Right Foot Strike 2
+%  LeftFS1      ...   Name of the event Left Foot Strike 1
+%  LeftFS2      ...   Name of the event Left Foot Strike 2
 % Updated May 18th 2013
 % - uses appropriate RMS calculation
 
@@ -11,7 +14,7 @@ nlength = 101;
     
 
 %--extract foot strike events and foot strike order ----------------
-[FS, side_order] = extract_foot_strike_events(data);
+[FS, side_order] = extract_foot_strike_events(data,RightFS1,RightFS2,LeftFS1,LeftFS2);
 
 if ~isempty(find(FS== 999, 1))
     gps_r = 999;
@@ -62,11 +65,14 @@ end
 gps_r = nanmean(gvsstk_r);                       
 gps_l= nanmean(gvsstk_l);              
 
-%%%%%%%%MODIFIER
-function [FS, side_order] = extract_foot_strike_events(data)
 
-[LFS1, ech] = findfield(data, 'LFS1');
-RFS1 = findfield(data, 'RFS1');
+function [FS, side_order] = extract_foot_strike_events(data, RightFS1,RightFS2,LeftFS1,LeftFS2)
+
+[LFS1, ech] = findfield(data, LeftFS1);
+LFS2 = findfield(data, LeftFS2);
+RFS1 = findfield(data, RightFS1);
+RFS2 = findfield(data, RightFS2);
+
 if LFS1(1) < RFS1(1)
     startfoot = 'Left';
     side_order = {'L', 'R'};
@@ -77,17 +83,17 @@ end
 
 if isin(startfoot,'Left')
     
-    a1 =  data.(ech).event.Left_FootStrike1(1);
-    b1 =  data.(ech).event.Right_FootStrike1(1);
+    a1 =  data.(ech).event.LFS1(1);
+    b1 =  data.(ech).event.RFS1(1);
 
-    if isfield(data.(ech).event,'Left_FootStrike2') 
-        a2 = data.(ech).event.Left_FootStrike2(1);
+    if isfield(data.(ech).event,LeftFS2) 
+        a2 = data.(ech).event.LFS2(1);
     else
         a2 = [999, 0, 0];
     end
     
-    if isfield(data.(ech).event,'Right_FootStrike2') 
-        b2 = data.(ech).event.Right_FootStrike2(1);
+    if isfield(data.(ech).event,RightFS2) 
+        b2 = data.(ech).event.RFS2(1);
     else
         b2 = [999, 0, 0];
     end
@@ -95,18 +101,18 @@ if isin(startfoot,'Left')
     
 elseif isin(startfoot,'Right')
     
-    a1 =  data.(ech).event.Right_FootStrike1(1);
-    b1 =  data.(ech).event.Left_FootStrike1(1);
+    a1 =  data.(ech).event.RFS1(1);
+    b1 =  data.(ech).event.LFS1(1);
     
-    if isfield(data.(ech).event,'Right_FootStrike2') 
-        a2 = data.(ech).event.Right_FootStrike2(1);
+    if isfield(data.(ech).event,RightFS2) 
+        a2 = data.(ech).event.RFS2(1);
     else
         warning('insufficient right foot strikes for GPS analysis')
         a2 = 999;
     end
     
-    if isfield(data.(ech).event,'Left_FootStrike2') 
-        b2 = data.(ech).event.Left_FootStrike2(1);
+    if isfield(data.(ech).event,LeftFS2) 
+        b2 = data.(ech).event.LFS2(1);
     else
         warning('insufficient left foot strikes for GPS analysis')
         b2 = 999;

@@ -138,7 +138,12 @@ if exist(fld5, 'dir')
 end
 copyfile(fld4,fld5);
 
-bmech_gaitprofilescore(fld5);
+RightFS1 = 'RFS1';
+RightFS2 = 'RFS2';
+LeftFS1 = 'LFS1';
+LeftFS2 = 'LFS2';
+flag = '_g_';
+bmech_gaitprofilescore(fld5,flag,RightFS1,RightFS2,LeftFS1,LeftFS2);
 
 %% STEP 6: CRP PROCESS
 
@@ -163,6 +168,8 @@ n_chns = {'LHipAngles_x','LKneeAngles_x','LAnkleAngles_x'...
 bmech_delete_too_short(fld6, n_chns)
 
 % d) partition to a complete gait cycle
+evt1 = 'LFS1';
+evt2 = 'LFS2';
 bmech_partition(fld6, evt1, evt2)
 
 % e) Compute CRP
@@ -227,14 +234,14 @@ disp (' ')
 disp([ch ' difference between CP and NORM at ' evt{v} ':'])
 disp (' ')
 r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail, mode,bonf);                                  
+omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail,mode,bonf);                                  
 
 ch = 'L_AK_MARP';
 disp (' ')
 disp([ch ' difference between CP and NORM at ' evt{v} ':'])
 disp (' ')
 r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail, mode,bonf);
+omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail,mode,bonf);
 
 % b) DP stats
 ch = 'L_KH_DP';
@@ -242,13 +249,13 @@ disp (' ')
 disp([ch ' difference between CP and NORM at ' evt{v} ':'])
 disp (' ')
 r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail, mode,bonf);
+omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail,mode,bonf);
 
 ch = 'L_AK_DP';
 disp (' ')
 disp([ch ' difference between CP and NORM at ' evt{v} ':'])
 disp (' ')
 r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail, mode,bonf);
+omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail,mode,bonf);
 
 end 
