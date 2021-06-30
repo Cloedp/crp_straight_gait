@@ -207,59 +207,43 @@ copyfile(fld7,fld8)
 % b) Create gait events 
 bmech_create_gait_events(fld8) 
 
-%% STEP 10: STATISTICAL ANALYSIS
+%% STEP 9: STATISTICAL ANALYSIS
 
 alpha = 0.05;
 evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
-dim1 = group;
+group = {'Aschau_NORM', 'CPOFM'};
+type = 'unpaired';
 
-for e = 1:length(evt)
-    % ajouter nom de l'event dans le disp. 
-    % utiliser omni
+for v = 1:length(evt)
+
 % a) MARP stats
 ch = 'L_KH_MARP';
-r = extracteventsdata(fld8,dim1,ch,evt{e});
-[~,pval] = ttest(r.CPOFM,r.Aschau_NORM,alpha);                                  
-disp(['p-value for L_KH_MARP = ',num2str(pval)])
-disp(['L_KH_MARP CPOFM = ',sprintf('%.1f',nanmean(r.CPOFM)),...
-    ' +/- ',sprintf('%.1f',nanstd(r.CPOFM)),' deg'])
-disp(['L_KH_MARP Aschau_NORM = ',sprintf('%.1f',nanmean(r.Aschau_NORM)),...
-    ' +/- ',sprintf('%.1f',nanstd(r.Aschau_NORM)),' deg'])
-disp(' ')
-
+disp (' ')
+disp([ch ' difference between CP and NORM at ' evt{v} ':'])
+disp (' ')
+r = extracteventsdata(fld8,group,ch,evt{v});
+omni_ttest(r.CPOFM,r.Aschau_NORM,type);                                  
 
 ch = 'L_AK_MARP';
-r = extracteventsdata(fld8,dim1,ch,evt{e});
-[~,pval] = ttest(r.CPOFM,r.Aschau_NORM,alpha);                                  
-disp(['p-value for L_AK_MARP = ',num2str(pval)])
-disp(['L_AK_MARP CPOFM = ',sprintf('%.1f',nanmean(r.CPOFM)),...
-    ' +/- ',sprintf('%.1f',nanstd(r.CPOFM)),' deg'])
-disp(['L_AK_MARP Aschau_NORM = ',sprintf('%.1f',nanmean(r.Aschau_NORM)),...
-    ' +/- ',sprintf('%.1f',nanstd(r.Aschau_NORM)),' deg'])
-disp(' ')
-
+disp (' ')
+disp([ch ' difference between CP and NORM at ' evt{v} ':'])
+disp (' ')
+r = extracteventsdata(fld8,group,ch,evt{v});
+omni_ttest(r.CPOFM,r.Aschau_NORM,type);
 
 % b) DP stats
-
 ch = 'L_KH_DP';
-r = extracteventsdata(fld8,dim1,ch,evt{e});
-[~,pval] = ttest(r.CPOFM,r.Aschau_NORM,alpha);                                  
-disp(['p-value for L_KH_DP = ',num2str(pval)])
-disp(['L_KH_DP CPOFM = ',sprintf('%.1f',nanmean(r.CPOFM)),...
-    ' +/- ',sprintf('%.1f',nanstd(r.CPOFM)),' deg'])
-disp(['L_KH_DP Aschau_NORM = ',sprintf('%.1f',nanmean(r.Aschau_NORM)),...
-    ' +/- ',sprintf('%.1f',nanstd(r.Aschau_NORM)),' deg'])
-disp(' ')
-
+disp (' ')
+disp([ch ' difference between CP and NORM at ' evt{v} ':'])
+disp (' ')
+r = extracteventsdata(fld8,group,ch,evt{v});
+omni_ttest(r.CPOFM,r.Aschau_NORM,type);
 
 ch = 'L_AK_DP';
-r = extracteventsdata(fld8,dim1,ch,evt{e});
-[~,pval] = ttest(r.CPOFM,r.Aschau_NORM,alpha);                                  
-disp(['p-value for L_AK_DP = ',num2str(pval)])
-disp(['L_AK_DP CPOFM = ',sprintf('%.1f',nanmean(r.CPOFM)),...
-    ' +/- ',sprintf('%.1f',nanstd(r.CPOFM)),' deg'])
-disp(['L_AK_DP Aschau_NORM = ',sprintf('%.1f',nanmean(r.Aschau_NORM)),...
-    ' +/- ',sprintf('%.1f',nanstd(r.Aschau_NORM)),' deg'])
-disp(' ')
+disp (' ')
+disp([ch ' difference between CP and NORM at ' evt{v} ':'])
+disp (' ')
+r = extracteventsdata(fld8,group,ch,evt{v});
+omni_ttest(r.CPOFM,r.Aschau_NORM,type);
 
 end 

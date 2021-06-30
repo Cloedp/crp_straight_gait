@@ -17,16 +17,16 @@ for i = 1:length(fl)
     
     for c = 1:length(chns)
         b = data.(chns{c}).line;
-%CHANGER FRAMES
+
         events = struct;
-        events.IC  = [1,  mean(b(1:2)),    0];
-        events.LR  = [2,  mean(b(2:12)),   0]; 
-        events.MS  = [12, mean(b(12:31)),  0];
-        events.TS  = [31, mean(b(31:50)),  0];
-        events.PSw = [50, mean(b(50:62)),  0];
-        events.ISw = [62, mean(b(62:75)),  0];
-        events.MSw = [75, mean(b(75:87)),  0];
-        events.TSw = [87, mean(b(87:100)), 0];
+        events.IC  = [1,  mean(b(1:3)),    0];
+        events.LR  = [3,  mean(b(3:13)),   0]; 
+        events.MS  = [13, mean(b(13:32)),  0];
+        events.TS  = [32, mean(b(32:51)),  0];
+        events.PSw = [51, mean(b(51:63)),  0];
+        events.ISw = [63, mean(b(63:76)),  0];
+        events.MSw = [76, mean(b(76:88)),  0];
+        events.TSw = [88, mean(b(88:101)), 0];
         data.(chns{c}).event = events;
     end
     zsave(fl{i}, data) 
