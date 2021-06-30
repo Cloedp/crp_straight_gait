@@ -209,10 +209,15 @@ bmech_create_gait_events(fld8)
 
 %% STEP 9: STATISTICAL ANALYSIS
 
-alpha = 0.05;
 evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
 group = {'Aschau_NORM', 'CPOFM'};
 type = 'unpaired';
+
+alpha = 0.05;
+thresh = 0.05;
+tail = 'both';
+mode = 'full';
+bonf = 1;
 
 for v = 1:length(evt)
 
@@ -222,14 +227,14 @@ disp (' ')
 disp([ch ' difference between CP and NORM at ' evt{v} ':'])
 disp (' ')
 r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type);                                  
+omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail, mode,bonf);                                  
 
 ch = 'L_AK_MARP';
 disp (' ')
 disp([ch ' difference between CP and NORM at ' evt{v} ':'])
 disp (' ')
 r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type);
+omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail, mode,bonf);
 
 % b) DP stats
 ch = 'L_KH_DP';
@@ -237,13 +242,13 @@ disp (' ')
 disp([ch ' difference between CP and NORM at ' evt{v} ':'])
 disp (' ')
 r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type);
+omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail, mode,bonf);
 
 ch = 'L_AK_DP';
 disp (' ')
 disp([ch ' difference between CP and NORM at ' evt{v} ':'])
 disp (' ')
 r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type);
+omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail, mode,bonf);
 
 end 
