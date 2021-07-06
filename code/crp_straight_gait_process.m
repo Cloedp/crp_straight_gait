@@ -216,46 +216,31 @@ bmech_create_gait_events(fld8)
 
 %% STEP 9: STATISTICAL ANALYSIS
 
-evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
-group = {'Aschau_NORM', 'CPOFM'};
 type = 'unpaired';
-
 alpha = 0.05;
 thresh = 0.05;
 tail = 'both';
 mode = 'full';
 bonf = 1;
 
-for v = 1:length(evt)
+% a) Group similarity for anthro (CPOFM/NORM)
+anthro = {'Age','Bodymass','Height'};
+group = {'Aschau_NORM', 'CPOFM'};
+ch= 'zoosystem';
+group_comparison(fld8,group,anthro,ch,type,alpha,thresh,tail,mode,bonf)
 
-% a) MARP stats
-ch = 'L_KH_MARP';
-disp (' ')
-disp([ch ' difference between CP and NORM at ' evt{v} ':'])
-disp (' ')
-r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail,mode,bonf);                                  
+% b) GPS difference between groups (CPOFM/NORM) 
+gps = {'GPS'};
+group = {'Aschau_NORM', 'CPOFM'};
+ch= 'SACR_x';
+gps_comparison(fld8,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
 
-ch = 'L_AK_MARP';
-disp (' ')
-disp([ch ' difference between CP and NORM at ' evt{v} ':'])
-disp (' ')
-r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail,mode,bonf);
+% c) GPS difference between CPOFM subgroups (GMFCS level)
+group = {'Level1','Level2','Level3'};
+gps_comparison_gmfcs(fld8,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
 
-% b) DP stats
-ch = 'L_KH_DP';
-disp (' ')
-disp([ch ' difference between CP and NORM at ' evt{v} ':'])
-disp (' ')
-r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail,mode,bonf);
-
-ch = 'L_AK_DP';
-disp (' ')
-disp([ch ' difference between CP and NORM at ' evt{v} ':'])
-disp (' ')
-r = extracteventsdata(fld8,group,ch,evt{v});
-omni_ttest(r.CPOFM,r.Aschau_NORM,type,alpha,thresh,tail,mode,bonf);
-
-end 
+% d) MARP and DP difference between groups at each event
+evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
+group = {'Aschau_NORM', 'CPOFM'};
+bonf = 1;                                                                   % Changer pour 32 
+MARP_DP_stats(fld8,group,evt,type,alpha,thresh,tail,mode,bonf)

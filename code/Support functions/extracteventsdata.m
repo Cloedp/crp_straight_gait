@@ -1,6 +1,6 @@
-function r = extractevents(fld,group,ch,evt)
+function r = extracteventsdata(fld,group,ch,evt)
 
-% R = EXTRACTEVENTS(fld,group,subjects,ch,evt) extracts event data from zoo file
+% R = EXTRACTEVENTSDATA(fld,group,ch,evt) extracts event data from zoo file
 %
 % ARGUMENTS
 %  fld         ...    Folder to operate on as string

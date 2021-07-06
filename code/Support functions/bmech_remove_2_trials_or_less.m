@@ -9,7 +9,8 @@ for s = 1:length(subjects)
     fl = engine('fld',fld,'extension','zoo', 'search path', subjects{s});
         if size(fl) < 2
         disp(['removing subject ', subjects{s},' because of insufficient trials for MARP and DP computation'])
-        bmech_removefolder(fld,subjects{s});
+        delfile(fl)
+        rmdir(fld,subjects{s},'s');
         end
 end
 
