@@ -61,6 +61,12 @@ for i = 1:length(fl)
                 GMFCS = 0;
             elseif strcmp(a,'-')
                 GMFCS = 0;
+            elseif strcmp(a,'I')
+                GMFCS = 1;
+            elseif strcmp(a,'II')
+                GMFCS = 2;
+            elseif strcmp(a,'III')
+                GMFCS = 3;
             elseif ismissing(a{1})
                 GMFCS = 0;
             else
