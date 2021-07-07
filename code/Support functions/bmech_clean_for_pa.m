@@ -12,13 +12,13 @@ for i = 1:length(fl)
     
     if isempty(findfield(data, evt1))
         delete(fl{i});
-        batchdisp(fl{i},'deleting trials because of missing event or channels');
+        batchdisp(fl{i},'deleting trial because of missing event');
     elseif isempty(findfield(data, evt2))
         delete(fl{i});
-        batchdisp(fl{i},'deleting trials because of missing event or channels');
+        batchdisp(fl{i},'deleting trial because of missing event');
     elseif ~isfield(data,'LHipAngles_x')
         delete(fl{i});
-        batchdisp(fl{i},'deleting trials because of missing event or channels');
+        batchdisp(fl{i},'deleting trial because of missing channels');
     end
 end
 

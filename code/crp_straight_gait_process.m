@@ -16,25 +16,31 @@ delfile(fldel_gs);
 delfile(fldel_st);
 
 % c) Delete abnormal folders (empty)
-[~,subjects] = extract_filestruct(fld0);
-for i = 1:length(subjects)
-    fl = engine('fld',fld0, 'search path', subjects{i}, 'extension','c3d'); % chek for only c3d files
-    if isempty(fl)                                                          % if no csv files
-    bmech_removefolder(fld0,subjects{i});
-    disp(['removing subject ', subjects{i},' because he has no files'])
+
+group = {'CPOFM','Aschau_NORM'};
+
+for g = 1:length(group)
+    subjects = GetSubDirsFirstLevelOnly([fld0, filesep, group{g}]);
+    for i = 1:length(subjects)
+        fl = engine('fld',fld0, 'folder', subjects{i}, 'extension','c3d');      % chek for only c3d files
+        if isempty(fl)     
+        disp(['removing subject ', subjects{i},' because he has no files'])
+        rmdir(fullfile(fld0,group{g},subjects{i}));  
+        end
     end
 end
 
 % d) Delete folder with no mft sheet
-[~,subjects] = extract_filestruct(fld0);
-for i = 1:length(subjects)
-    fl = engine('fld',fld0, 'search path', subjects{i},'extension','csv');  % chek for only csv files
-    if isempty(fl)                                                          % if no csv file = no mft file
-    bmech_removefolder(fld0,subjects{i}); 
-    disp(['removing subject ', subjects{i},' because he has no mft sheet'])                                   % remove subject because not enough info
+for g = 1:length(group)
+    subjects = GetSubDirsFirstLevelOnly([fld0, filesep, group{g}]);
+    for i = 1:length(subjects)
+        fl = engine('fld',fld0, 'folder', subjects{i},'extension','csv');       % chek for only csv files
+        if isempty(fl)                                                          % if no csv file = no mft file
+        disp(['removing subject ', subjects{i},' because he has no mft sheet'])
+        rmdir(fullfile(fld0,group{g},subjects{i}));                                                   % remove subject because not enough info
+        end
     end
 end
-
 %% STEP 1: CONVERT C3D TO ZOO FILE
 
 fld1 = [fld,filesep, 'data', filesep, '1-c3d2zoo'];
@@ -160,8 +166,8 @@ copyfile(fld5,fld6)
 chns = {'LHipAngles_x', 'LKneeAngles_x','LAnkleAngles_x'};
 bmech_phase_angle(fld6, chns)
 
-% c) delete trials that can be partition from LFS1 to LFS2
-
+% c) delete trials that can't be partition from LFS1 to LFS2
+% THIS STEP SHOULD BE NOT NECESSARY
 n_chns = {'LHipAngles_x','LKneeAngles_x','LAnkleAngles_x'...
          'LHipAnglesPhase_x','LKneeAnglesPhase_x','LAnkleAnglesPhase_x'};
          
@@ -236,8 +242,17 @@ ch= 'SACR_x';
 gps_comparison(fld8,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
 
 % c) GPS difference between CPOFM subgroups (GMFCS level)
+gps = {'GPS'};
+ch= 'SACR_x';
 group = {'Level1','Level2','Level3'};
 gps_comparison_gmfcs(fld8,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
+
+% c) MARP and DP difference between CPOFM subgroups (GMFCS level)
+evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
+bonf = 1;
+group = {'Level1','Level2','Level3'};
+metrics = {'L_KH_MARP','L_AK_MARP','L_KH_DP','L_AK_DP'};
+metrics_comparison_gmfcs(fld8,group,metrics,evt,type,alpha,thresh,tail,mode,bonf)
 
 % d) MARP and DP difference between groups at each event
 evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};

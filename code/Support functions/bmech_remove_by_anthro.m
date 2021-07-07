@@ -26,42 +26,45 @@ end
 
 cd(fld)
 
-[~,subjects] = extract_filestruct(fld);
+group = {'CPOFM','Aschau_NORM'};
 
-for i = 1:length(subjects)
-    fl = engine('fld',fld,'extension','zoo', 'search path', subjects{i});
-    data = zload(fl{1});
-    r = data.zoosystem.Anthro.(anthro);
-    if strcmp(condition,'>=')
-        if r >= value
-           disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
-           bmech_removefolder(fld,subjects{i});
+for g = 1:length(group)
+    subjects = GetSubDirsFirstLevelOnly([fld, filesep, group{g}]);
+    for i = 1:length(subjects)
+        fl = engine('fld',fld,'extension','zoo', 'folder', subjects{i});
+        data = zload(fl{1});
+        r = data.zoosystem.Anthro.(anthro);
+
+        if strcmp(condition,'>=')
+            if r >= value
+               disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+               rmdir(fullfile(fld,group{g},subjects{i}));  
+            end
         end
-    end
-    
-    if strcmp(condition,'<=')
-        if r <= value
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
-            bmech_removefolder(fld,subjects{i})
+
+        if strcmp(condition,'<=')
+            if r <= value
+                disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+                rmdir(fullfile(fld,group{g},subjects{i})); 
+            end
         end
-    end
-    if strcmp(condition,'<')
-        if r < value
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
-            bmech_removefolder(fld,subjects{i})
+        if strcmp(condition,'<')
+            if r < value
+                disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+                rmdir(fullfile(fld,group{g},subjects{i})); 
+            end
         end
-    end
-    if strcmp(condition,'>')
-        if r > value
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
-            bmech_removefolder(fld,subjects{i})
+        if strcmp(condition,'>')
+            if r > value
+                disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+                rmdir(fullfile(fld,group{g},subjects{i})); 
+            end
         end
-    end
-    if strcmp(condition,'=')
-        if r == value
-            disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
-            bmech_removefolder(fld,subjects{i})
+        if strcmp(condition,'=')
+            if r == value
+                disp(['removing subject ', subjects{i},' because ', anthro, ' is ',condition, num2str(value)])
+                rmdir(fullfile(fld,group{g},subjects{i})); 
+            end
         end
     end
 end
-

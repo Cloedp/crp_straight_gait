@@ -3,14 +3,15 @@ function bmech_remove_2_trials_or_less(fld)
 
 cd(fld)
 
-[~,subjects] = extract_filestruct(fld);
+group = {'CPOFM','Aschau_NORM'};
 
-for s = 1:length(subjects)
-    fl = engine('fld',fld,'extension','zoo', 'search path', subjects{s});
-        if size(fl) < 2
-        disp(['removing subject ', subjects{s},' because of insufficient trials for MARP and DP computation'])
-        delfile(fl)
-        rmdir(fld,subjects{s},'s');
-        end
+for g = 1:length(group)
+    subjects = GetSubDirsFirstLevelOnly([fld, filesep, group{g}]);
+    for s = 1:length(subjects)
+        fl = engine('fld',fld,'extension','zoo', 'folder', subjects{s});
+            if size(fl) < 2
+            disp(['removing subject ', subjects{s},' because of insufficient trials for MARP and DP computation'])
+            rmdir(fullfile(fld,group{g},subjects{s}),'s');  
+            end
+    end
 end
-
