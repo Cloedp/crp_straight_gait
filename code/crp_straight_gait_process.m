@@ -86,6 +86,8 @@ copyfile(fld2,fld3)
 % b) Extract Anthro Sex & GMFCS  
 bmech_extract_in_mft(fld3,'Sex');   %(1=M, 2=F)
 bmech_extract_in_mft(fld3,'GMFCS');
+bmech_extract_in_mft(fld3,'Bodymass');
+bmech_extract_in_mft(fld3,'Height');
 
 % c) delete mft file
 fl = engine('fld',fld3,'extension','csv'); 
@@ -229,19 +231,24 @@ tail = 'both';
 mode = 'full';
 bonf = 1;
 
-% a) Group similarity for anthro (CPOFM/NORM)
+% a) Quantitative stats
+
+extractnumberbyGMFCS(fld8)
+extractnumberbygroup(fld8)
+
+% b) Group similarity for anthro (CPOFM/NORM)
 anthro = {'Age','Bodymass','Height'};
 group = {'Aschau_NORM', 'CPOFM'};
 ch= 'zoosystem';
 group_comparison(fld8,group,anthro,ch,type,alpha,thresh,tail,mode,bonf)
 
-% b) GPS difference between groups (CPOFM/NORM) 
+% c) GPS difference between groups (CPOFM/NORM) 
 gps = {'GPS'};
 group = {'Aschau_NORM', 'CPOFM'};
 ch= 'SACR_x';
 gps_comparison(fld8,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
 
-% c) GPS difference between CPOFM subgroups (GMFCS level)
+% d) GPS difference between CPOFM subgroups (GMFCS level)
 gps = {'GPS'};
 ch= 'SACR_x';
 group = {'Level1','Level2','Level3'};
@@ -254,7 +261,7 @@ group = {'Level1','Level2','Level3'};
 metrics = {'L_KH_MARP','L_AK_MARP','L_KH_DP','L_AK_DP'};
 metrics_comparison_gmfcs(fld8,group,metrics,evt,type,alpha,thresh,tail,mode,bonf)
 
-% d) MARP and DP difference between groups at each event
+% e) MARP and DP difference between groups at each event
 evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
 group = {'Aschau_NORM', 'CPOFM'};
 bonf = 1;                                                                   % Changer pour 32 

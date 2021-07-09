@@ -75,5 +75,28 @@ for i = 1:length(fl)
             data.zoosystem.Anthro.GMFCS = GMFCS; % write to zoo
         end
     end
+            % extract Bodymass if there is not already
+            
+    if strcmp(anthro,'Bodymass')
+        if ~isfield(data.zoosystem.Anthro,'Bodymass')
+            mft_path = [fld_sub, filesep, 'Muskelfunktionstest.csv']; % Set path mft.csv
+            C = readcell(mft_path);
+            [row,col] = find(strcmp(C,'Körpergewicht'));
+            Bodymass = C(row,col+1);
+            data.zoosystem.Anthro.Bodymass = Bodymass{1}; 
+        end
+    end
+            
+            % extract Height if there is not already
+    if strcmp(anthro,'Height')
+        if ~isfield(data.zoosystem.Anthro,'Height')
+            mft_path = [fld_sub, filesep, 'Muskelfunktionstest.csv']; % Set path mft.csv
+            C = readcell(mft_path);
+            [row,col] = find(strcmp(C,'Körpergröße'));
+            Height = C(row,col+1);
+            data.zoosystem.Anthro.Height = Height{1}; 
+        end
+    end
+         
     zsave(fl{i}, data)
 end

@@ -1,6 +1,6 @@
 function r = extractnumberbyGMFCS(fld)
 
-% R = EXTRACTGPSDATA_CP(fld,group) extracts metrics data from zoo file
+% R = extractnumberbyGMFCS(fld) extracts number of subjects for each GMFCS level 
 %
 % ARGUMENTS
 %  fld         ...    Folder to operate on as string
