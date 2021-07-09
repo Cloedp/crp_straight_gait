@@ -30,12 +30,15 @@ for i = 1:length(group)
         file = engine('path',[fld,s,group{i},s,subjects{j}],'extension','zoo');
         
         if ~isempty(file)
-            data = zload(file{1});                                    % load zoo file
+            data = zload(file{1});
+            if isfield(data.(ch).Anthro,anthro)
             anthroval = findfield(data.(ch),anthro);                  % searches for local event
-            
-            estk(j) = anthroval;                                 % add to event stk
+            estk(j) = anthroval;
+            else
+            disp([subjects{j}, ' has no ', anthro, ' data in Anthro'])
+            end
         end
-        
     end
-    r.(group{i})= estk;                                               % save to struct
+    r.(group{i})= estk;  
+end
 end
