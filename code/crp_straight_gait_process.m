@@ -52,7 +52,7 @@ if exist(fld1, 'dir')
 end
 copyfile(fld0,fld1);
 
-% b) Covert c3d to zoo
+% b) Convert c3d to zoo
 c3d2zoo(fld1,'yes');
       
 %% STEP 2: REMOVE ADULTS (-18 YEARS OLD)
@@ -83,13 +83,13 @@ if exist(fld3, 'dir')
 end
 copyfile(fld2,fld3)
 
-% b) Extract Anthro Sex & GMFCS  
+% b) Extract Sex & GMFCS and/or missing anthro (Bodymass, Height)  
 bmech_extract_in_mft(fld3,'Sex');   %(1=M, 2=F)
 bmech_extract_in_mft(fld3,'GMFCS');
 bmech_extract_in_mft(fld3,'Bodymass');
 bmech_extract_in_mft(fld3,'Height');
 
-% c) delete mft file
+% c) Delete mft file
 fl = engine('fld',fld3,'extension','csv'); 
 delfile(fl);
 
@@ -146,6 +146,7 @@ if exist(fld5, 'dir')
 end
 copyfile(fld4,fld5);
 
+% b) Compute GPS
 RightFS1 = 'RFS1';
 RightFS2 = 'RFS2';
 LeftFS1 = 'LFS1';
@@ -164,18 +165,18 @@ if exist(fld6, 'dir')
 end
 copyfile(fld5,fld6)
 
-% b) compute phase angle on complete signal 
+% b) Compute phase angle on complete signal 
 chns = {'LHipAngles_x', 'LKneeAngles_x','LAnkleAngles_x'};
 bmech_phase_angle(fld6, chns)
 
-% c) delete trials that can't be partition from LFS1 to LFS2
+% c) Delete trials that can't be partition from LFS1 to LFS2
 % THIS STEP SHOULD BE NOT NECESSARY
-n_chns = {'LHipAngles_x','LKneeAngles_x','LAnkleAngles_x'...
-         'LHipAnglesPhase_x','LKneeAnglesPhase_x','LAnkleAnglesPhase_x'};
+%n_chns = {'LHipAngles_x','LKneeAngles_x','LAnkleAngles_x'...
+        % 'LHipAnglesPhase_x','LKneeAnglesPhase_x','LAnkleAnglesPhase_x'};
          
-bmech_delete_too_short(fld6, n_chns)
+%bmech_delete_too_short(fld6, n_chns)
 
-% d) partition to a complete gait cycle
+% d) Partition to a complete gait cycle
 evt1 = 'LFS1';
 evt2 = 'LFS2';
 bmech_partition(fld6, evt1, evt2)
@@ -186,7 +187,7 @@ ch_AK = {'LAnkleAnglesPhase_x','LKneeAnglesPhase_x'};
 bmech_continuous_relative_phase(fld6, ch_KH)
 bmech_continuous_relative_phase(fld6, ch_AK)
 
-% f) normalize to 101 frames
+% f) Normalize to 101 frames
 bmech_normalize(fld6)
 
 %% STEP 7: COMPUTE METRICS (MARP, DP)
@@ -266,3 +267,18 @@ evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
 group = {'Aschau_NORM', 'CPOFM'};
 bonf = 1;                                                                   % Changer pour 32 
 MARP_DP_stats(fld8,group,evt,type,alpha,thresh,tail,mode,bonf)
+
+%% STEP 10: GENERATE TABLES
+
+cd(fld8)
+
+[~, subjects] = extract_filestruct(fld8);
+groups = GetSubDirsFirstLevelOnly(fld8);
+
+anthro_evts = {'Height','Bodymass', 'Sex', 'Age', 'GMFCS'};
+chns = {''};
+
+evalFile = eventval('fld', fld8, 'dim1', groups, 'dim2', subjects, 'ch', chns, ...
+    'localevents', 'none', 'globalevents','none', 'anthroevts', anthro_evts);
+
+eventval2mixedANOVA('eventvalFile', evalFile)

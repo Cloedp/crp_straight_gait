@@ -25,16 +25,13 @@ for g = 1:length(group)
     if g == 2
     groupfld =[fld,s,group{g}];
     end 
-    
+    trials = engine('path',group{g},'extension','zoo');
+    numtrials = length(trials);
+    disp([num2str(numtrials),' is the number of trials for the ', group{g}])
     [subjects] = extract_filestruct(groupfld);
-    
+
     for j = 1:length(subjects)
-
-        file = engine('path',[groupfld,s,subjects{j}],'extension','zoo');
         
-        if ~isempty(file)
-           data = zload(file{1});
-
                if strcmp(group{g},'CPOFM')
                    group1 = group1 + 1;
 
@@ -42,7 +39,6 @@ for g = 1:length(group)
                    group2 = group2 + 1;
                
                end
-         end
     end
 end
 r.(group{1})= group1;                                              
