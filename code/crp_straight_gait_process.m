@@ -238,7 +238,7 @@ extractnumberbyGMFCS(fld8)
 extractnumberbygroup(fld8)
 
 % b) Group similarity for anthro (CPOFM/NORM)
-anthro = {'Age','Bodymass','Height'};
+anthro = {'Age','Height','Bodymass'};
 group = {'Aschau_NORM', 'CPOFM'};
 ch= 'zoosystem';
 group_comparison(fld8,group,anthro,ch,type,alpha,thresh,tail,mode,bonf)
@@ -270,15 +270,34 @@ MARP_DP_stats(fld8,group,evt,type,alpha,thresh,tail,mode,bonf)
 
 %% STEP 10: GENERATE TABLES
 
-cd(fld8)
+fld9 = [fld,filesep, 'data', filesep, '9-tables'];
 
-[~, subjects] = extract_filestruct(fld8);
-groups = GetSubDirsFirstLevelOnly(fld8);
+% a) Copy step 6 files
+if exist(fld9, 'dir')
+    disp('removing old data folder...')
+    rmdir(fld9)
+end
+copyfile(fld8,fld9)
+
+cd(fld9)
+
+groups = GetSubDirsFirstLevelOnly(fld9);
+
+for g = 1:length(groups)
+    subjects = GetSubDirsFirstLevelOnly([fld9, filesep, groups{g}]);
+    for s = 1:length(subjects)
+        fl = engine('fld',fld9,'extension','zoo', 'folder', subjects{s});
+        for f = 2:length(fl)
+            delete(fl{f});
+        end 
+    end
+end
+
+[~, subjects] = extract_filestruct(fld9);
+
 
 anthro_evts = {'Height','Bodymass', 'Sex', 'Age', 'GMFCS'};
 chns = {''};
 
-evalFile = eventval('fld', fld8, 'dim1', groups, 'dim2', subjects, 'ch', chns, ...
+evalFile = eventval('fld', fld9, 'dim1', groups, 'dim2', subjects, 'ch', chns, ...
     'localevents', 'none', 'globalevents','none', 'anthroevts', anthro_evts);
-
-eventval2mixedANOVA('eventvalFile', evalFile)

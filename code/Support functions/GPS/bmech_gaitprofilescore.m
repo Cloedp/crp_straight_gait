@@ -48,7 +48,7 @@ for i = 1:length(subs)
     if isempty(flag)
         fl = engine('fld',fld,'search path', sub, 'ext', 'zoo');
     else
-        fl = engine('fld',fld,'search path', sub, 'search file', flag);
+        fl = engine('fld',fld,'folder', sub, 'search file', flag);
     end
     
     if ~isempty(fl)

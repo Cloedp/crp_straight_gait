@@ -28,11 +28,15 @@ for i = 1:length(group)
     for j = 1:length(subjects)
 
         file = engine('path',[fld,s,group{i},s,subjects{j}],'extension','zoo');
-        
+
         if ~isempty(file)
             data = zload(file{1});
             if isfield(data.(ch).Anthro,anthro)
-            anthroval = findfield(data.(ch),anthro);                  % searches for local event
+            anthroval = findfield(data.(ch),anthro); % searches for local event
+                    if ischar(anthroval)
+                       anthroval = replace(anthroval,',','.');
+                       anthroval = str2double(anthroval);
+                    end
             estk(j) = anthroval;
             else
             disp([subjects{j}, ' has no ', anthro, ' data in Anthro'])
