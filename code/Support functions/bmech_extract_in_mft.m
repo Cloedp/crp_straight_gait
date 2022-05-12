@@ -96,6 +96,17 @@ for i = 1:length(fl)
             Height = C(row,col+1);
             data.zoosystem.Anthro.Height = Height{1}; 
         end
+        if ischar(data.zoosystem.Anthro.Height)
+           Height = data.zoosystem.Anthro.Height;
+           Height = replace(Height,',','.');
+           Height = str2double(Height);
+           data.zoosystem.Anthro.Height = Height; 
+        end
+        if data.zoosystem.Anthro.Height <= 300
+           Height = data.zoosystem.Anthro.Height; 
+           Height = Height * 10;
+           data.zoosystem.Anthro.Height = Height;
+        end
     end
          
     zsave(fl{i}, data)

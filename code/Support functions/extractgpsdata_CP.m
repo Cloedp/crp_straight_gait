@@ -66,5 +66,4 @@ s = filesep;                                                    % determines sla
     end
 r.(group{1})= group1;                                              
 r.(group{2})= group2; 
-r.(group{3})= group3; 
 end

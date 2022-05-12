@@ -44,7 +44,7 @@ for i = 1:length(group)
             end
             
             if evtval(2)==999                                   % check for outlier
-                evtval(2) = NaN;
+               evtval(2) = NaN;
             end
             
             estk(j) = evtval(2);                                % add to event stk

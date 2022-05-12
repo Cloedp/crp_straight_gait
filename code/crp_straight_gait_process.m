@@ -169,23 +169,14 @@ copyfile(fld5,fld6)
 chns = {'LHipAngles_x', 'LKneeAngles_x','LAnkleAngles_x'};
 bmech_phase_angle(fld6, chns)
 
-% c) Delete trials that can't be partition from LFS1 to LFS2
-% THIS STEP SHOULD BE NOT NECESSARY
-%n_chns = {'LHipAngles_x','LKneeAngles_x','LAnkleAngles_x'...
-        % 'LHipAnglesPhase_x','LKneeAnglesPhase_x','LAnkleAnglesPhase_x'};
-         
-%bmech_delete_too_short(fld6, n_chns)
-
 % d) Partition to a complete gait cycle
 evt1 = 'LFS1';
 evt2 = 'LFS2';
 bmech_partition(fld6, evt1, evt2)
 
 % e) Compute CRP
-ch_KH = {'LKneeAnglesPhase_x','LHipAnglesPhase_x'}; 
-ch_AK = {'LAnkleAnglesPhase_x','LKneeAnglesPhase_x'}; 
-bmech_continuous_relative_phase(fld6, ch_KH)
-bmech_continuous_relative_phase(fld6, ch_AK)
+bmech_continuous_relative_phase(fld6, 'LKneeAnglesPhase_x','LHipAnglesPhase_x') % for KH
+bmech_continuous_relative_phase(fld6, 'LAnkleAnglesPhase_x','LKneeAnglesPhase_x') % For AK
 
 % f) Normalize to 101 frames
 bmech_normalize(fld6)
@@ -223,7 +214,7 @@ copyfile(fld7,fld8)
 % b) Create gait events 
 bmech_create_gait_events(fld8) 
 
-%% STEP 9: STATISTICAL ANALYSIS
+%% STATISTICAL ANALYSIS (impro)
 
 type = 'unpaired';
 alpha = 0.05;
@@ -232,43 +223,32 @@ tail = 'both';
 mode = 'full';
 bonf = 1;
 
-% a) Quantitative stats
-
-extractnumberbyGMFCS(fld8)
-extractnumberbygroup(fld8)
-
-% b) Group similarity for anthro (CPOFM/NORM)
-anthro = {'Age','Height','Bodymass'};
-group = {'Aschau_NORM', 'CPOFM'};
-ch= 'zoosystem';
-group_comparison(fld8,group,anthro,ch,type,alpha,thresh,tail,mode,bonf)
-
-% c) GPS difference between groups (CPOFM/NORM) 
+% a) GPS difference between groups (CPOFM/NORM) 
 gps = {'GPS'};
 group = {'Aschau_NORM', 'CPOFM'};
 ch= 'SACR_x';
-gps_comparison(fld8,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
+gps_comparison(fld_stats,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
 
-% d) GPS difference between CPOFM subgroups (GMFCS level)
-gps = {'GPS'};
+% b) GPS difference between CPOFM subgroups (GMFCS level)
+gps = {'GPS_L'};
 ch= 'SACR_x';
-group = {'Level1','Level2','Level3'};
-gps_comparison_gmfcs(fld8,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
+group = {'Level1','Level2'};
+gps_comparison_gmfcs(fld_stats,group,gps,ch,type,alpha,thresh,tail,mode,bonf)
 
 % c) MARP and DP difference between CPOFM subgroups (GMFCS level)
 evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
 bonf = 1;
 group = {'Level1','Level2','Level3'};
 metrics = {'L_KH_MARP','L_AK_MARP','L_KH_DP','L_AK_DP'};
-metrics_comparison_gmfcs(fld8,group,metrics,evt,type,alpha,thresh,tail,mode,bonf)
+metrics_comparison_gmfcs(fld_stats,group,metrics,evt,type,alpha,thresh,tail,mode,bonf)
 
-% e) MARP and DP difference between groups at each event
+% d) MARP and DP difference between groups at each event
 evt = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
 group = {'Aschau_NORM', 'CPOFM'};
 bonf = 1;                                                                   % Changer pour 32 
-MARP_DP_stats(fld8,group,evt,type,alpha,thresh,tail,mode,bonf)
+MARP_DP_stats(fld_stats,group,evt,type,alpha,thresh,tail,mode,bonf)
 
-%% STEP 10: GENERATE TABLES
+%% GENERATE TABLES (impro)
 
 fld9 = [fld,filesep, 'data', filesep, '9-tables'];
 
@@ -284,20 +264,100 @@ cd(fld9)
 groups = GetSubDirsFirstLevelOnly(fld9);
 
 for g = 1:length(groups)
-    subjects = GetSubDirsFirstLevelOnly([fld9, filesep, groups{g}]);
-    for s = 1:length(subjects)
-        fl = engine('fld',fld9,'extension','zoo', 'folder', subjects{s});
+    sub = GetSubDirsFirstLevelOnly([fld9, filesep, groups{g}]);
+    for s = 1:length(sub)
+        disp(sub{s})
+        fl = engine('fld',fld9,'folder', sub{s},'extension','zoo');
         for f = 2:length(fl)
             delete(fl{f});
         end 
     end
 end
 
-[~, subjects] = extract_filestruct(fld9);
+sub1 = GetSubDirsFirstLevelOnly([fld9, filesep, groups{1}]);
 
+sub2 = GetSubDirsFirstLevelOnly([fld9, filesep, groups{2}]);
+
+anthro_evts = {'Height','Bodymass', 'Sex', 'Age', 'GMFCS'};
+chns = {''};
+fld10 = [fld,filesep, 'data', filesep, '9-tables', filesep, 'Aschau_NORM'];
+fld11 = [fld,filesep, 'data', filesep, '9-tables', filesep, 'CPOFM'];
+
+evalFile = eventval('fld', fld10, 'dim1', groups, 'dim2', sub1, 'ch', chns, ...
+    'localevents', 'none', 'globalevents','none', 'anthroevts', anthro_evts);
+
+evalFile = eventval('fld', fld11, 'dim1', groups, 'dim2', sub2, 'ch', chns, ...
+    'localevents', 'none', 'globalevents','none', 'anthroevts', anthro_evts);
+
+%% STEP 11: GROUP COMPARISON 
+
+fld_stats = [fld,filesep, 'data', filesep, 'Compa-group'];
+
+type = 'unpaired';
+alpha = 0.05;
+thresh = 0.05;
+tail = 'both';
+mode = 'full';
+bonf = 1;
+
+% a) Quantitative stats
+
+extractnumberbyGMFCS(fld_stats)
+extractnumberbygroup(fld_stats)
+
+% b) Group similarity for anthro (NORM\CPOFM)
+anthro = {'Age','Height','Bodymass'};
+group = {'Aschau_NORM', 'CPOFM'};
+ch= 'zoosystem';
+group_comparison(fld_stats,group,anthro,ch,type,alpha,thresh,tail,mode,bonf)
+
+%% TABLES ANTHRO DATA
+
+fld_anthro = [fld,filesep, 'data', filesep, 'anthro'];
+
+if exist(fld_anthro, 'dir')
+    disp('removing old data folder...')
+    rmdir(fld_anthro)
+end
+
+copyfile(fld_stats,fld_anthro)
+
+cd(fld_anthro)
+
+groups = GetSubDirsFirstLevelOnly(fld_anthro);
+
+for g = 1:length(groups)
+    sub = GetSubDirsFirstLevelOnly([fld_anthro, filesep, groups{g}]);
+    for s = 1:length(sub)
+        fl = engine('fld',fld_anthro,'folder', sub{s},'extension','zoo');
+        for f = 2:length(fl)
+            delete(fl{f});
+        end 
+    end
+end
+
+% c) Make tables
+
+[~,subjects] = extract_filestruct(fld_anthro);
 
 anthro_evts = {'Height','Bodymass', 'Sex', 'Age', 'GMFCS'};
 chns = {''};
 
-evalFile = eventval('fld', fld9, 'dim1', groups, 'dim2', subjects, 'ch', chns, ...
+anthroFile = eventval('fld', fld_anthro, 'dim1', groups, 'dim2', subjects, 'ch', chns, ...
     'localevents', 'none', 'globalevents','none', 'anthroevts', anthro_evts);
+
+%% FOR REGRESSION MARP_DP_GPS
+
+fld = uigetfolder;
+group = {'CPOFM'};
+chns = {'L_KH_MARP','L_AK_MARP','L_KH_DP','L_AK_DP'};
+subjects = GetSubDirsFirstLevelOnly(fld);
+lcl_evts = {'IC', 'LR', 'MS', 'TS', 'PSw','ISw','MSw','TSw'};
+antro_evts = {'GPS_L'};
+
+% Good GPS value
+gpsval = 'GPS_L';
+bmech_transformGPSvalue(fld,gpsval)
+
+evalFile = eventval('fld', fld, 'dim1', groups, 'dim2', subjects, 'ch', chns, ...
+'localevents', lcl_evts, 'globalevents', 'none' ,'anthroevts', antro_evts);
