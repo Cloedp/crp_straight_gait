@@ -109,8 +109,7 @@ copyfile(fld3,fld4)
 bmech_explode(fld4)
 
 % c) Add Foot Strike events
-
-bmech_addevent(fld4, 'SACR_x','RFS', 'RFS') 
+bmech_addevent(fld4, 'SACR_x','RFS', 'RFS')
 bmech_addevent(fld4, 'SACR_x','LFS', 'LFS')
 
 % d) Remove extra Vicon channels
